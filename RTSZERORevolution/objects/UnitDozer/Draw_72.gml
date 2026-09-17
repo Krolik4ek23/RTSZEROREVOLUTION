@@ -1,0 +1,1 @@
+draw_sprite_ext(sprUnitTankT1_Chassis, 0, x, y, 1, 1, BaseDir, c_white, 1);

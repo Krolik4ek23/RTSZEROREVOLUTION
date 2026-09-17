@@ -1,0 +1,1 @@
+if(IgnoreCollisionBuilds) if(!place_meeting(x, y, Builds)) IgnoreCollisionBuilds = false;

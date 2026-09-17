@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"format_size",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"format_size",
+  "parent":{
+    "name":"Misc",
+    "path":"folders/Scripts/Misc.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

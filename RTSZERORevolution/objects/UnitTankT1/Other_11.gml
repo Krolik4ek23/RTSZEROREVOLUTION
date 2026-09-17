@@ -1,0 +1,1 @@
+draw_sprite_ext(sprUnitTankT1_Base, 0, x - Game.CamX, y - Game.CamY, 1, 1, BaseDir, c_white, 1);

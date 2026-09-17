@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"server_disconnect",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"server_disconnect",
+  "parent":{
+    "name":"Server",
+    "path":"folders/Scripts/Server.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

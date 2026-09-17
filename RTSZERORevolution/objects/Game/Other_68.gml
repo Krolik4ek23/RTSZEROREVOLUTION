@@ -1,0 +1,1 @@
+if(ds_map_exists(async_load, "size")) Game.NetStatRead += async_load[? "size"];

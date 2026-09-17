@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"path_optimize",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"path_optimize",
+  "parent":{
+    "name":"Misc",
+    "path":"folders/Scripts/Misc.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

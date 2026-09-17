@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"net_generate_uid",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"net_generate_uid",
+  "parent":{
+    "name":"Network",
+    "path":"folders/Scripts/Network.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

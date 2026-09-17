@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"network_packet",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"network_packet",
+  "parent":{
+    "name":"Network",
+    "path":"folders/Scripts/Network.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

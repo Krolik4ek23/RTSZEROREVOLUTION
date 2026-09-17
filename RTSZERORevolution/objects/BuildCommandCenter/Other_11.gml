@@ -1,0 +1,1 @@
+draw_sprite_ext(sprite_index, 0, x - Game.CamX, y - Game.CamY, 1, 1, 90 * Dir, c_white, 1);

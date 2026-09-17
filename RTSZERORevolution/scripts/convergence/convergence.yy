@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"convergence",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"convergence",
+  "parent":{
+    "name":"Misc",
+    "path":"folders/Scripts/Misc.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
