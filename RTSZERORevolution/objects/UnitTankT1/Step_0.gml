@@ -1,3 +1,5 @@
+event_inherited();
+
 if(point_distance(x, y, ToX, ToY) > 4) {
 	var PathNumber = path_get_number(Path);
 	if (path_get_number(Path) == 0 or 
@@ -23,4 +25,8 @@ if(point_distance(x, y, ToX, ToY) > 4) {
 	}
 }
 
-if(SeeX == 0) PushDir = BaseDir;
+if(instance_exists(Target) and Damage > 0) {
+	PushDir -= angle_difference(PushDir, point_direction(x, y, Target.x, Target.y)) / 6;
+} else {
+	PushDir = BaseDir;
+}

@@ -25,6 +25,7 @@ with(Terrains) event_perform(ev_draw, ev_draw_end);
 if(!ds_list_empty(Pick)) {
 	for(var j = ds_list_size(Pick), i = 0; i < j; i++) {
 		var Unit = Pick[| i];
+		if(!instance_exists(Unit)) continue;
 		draw_circle_color(Unit.x - 1, Unit.y - 1, Unit.OutlineRadius, c_red, c_red, 1);
 		draw_circle_color(Unit.x - 1, Unit.y - 1, Unit.OutlineRadius + 0.5, c_red, c_red, 1);
 	}

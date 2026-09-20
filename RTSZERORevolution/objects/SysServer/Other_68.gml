@@ -31,6 +31,12 @@ if(evId == Socket) {
 			for(var i = 0; i < NET_PLAYERS; i++) {
 				if(PlrSocket[i] != evSocket) continue;
 				
+				// Уничтожаем юнитов и здания отключившегося игрока
+				DiscPlr = PlrObject[i];
+				with(Civilian) {
+					if(Plr == other.DiscPlr) instance_destroy(self, false);
+				}
+				
 				PlrSocket[i] = -1;
 				PlrAuthed[i] = 0;
 				PlrObject[i].Color = 0;
@@ -151,23 +157,34 @@ switch(evPacket) {
 			if(!npUID) break;
 			
 			var ObjID = net_search_uid(npUID);
-			if(!ObjID) continue;
-			
 			var npType = buffer_read(evBuff, buffer_u8);
+			
 			if(npType == 1) {
-				if(object_get_parent(ObjID.object_index) != Units) continue;
-				
-				ObjID.ToX = buffer_read(evBuff, buffer_u16);
-				ObjID.ToY = buffer_read(evBuff, buffer_u16);
+				// Движение
+				var npToX = buffer_read(evBuff, buffer_u16);
+				var npToY = buffer_read(evBuff, buffer_u16);
+				if(ObjID != noone and object_get_parent(ObjID.object_index) == Units) {
+					ObjID.ToX = npToX;
+					ObjID.ToY = npToY;
+					ObjID.Target = noone;
+				}
 			} else if(npType == 2) {
+				// Старт способности
 				var npSlot = buffer_read(evBuff, buffer_u8);
-				with(ObjID) event(EventType.CivAbilityStartBuild, npSlot);
+				if(ObjID != noone) with(ObjID) event(EventType.CivAbilityStartBuild, npSlot);
 			} else if(npType == 3) {
+				// Размещение постройки
 				var npSlot = buffer_read(evBuff, buffer_u8);
 				var npCellX = buffer_read(evBuff, buffer_u8);
 				var npCellY = buffer_read(evBuff, buffer_u8);
 				var npDir = buffer_read(evBuff, buffer_u8);
-				with(ObjID) event(EventType.CivAbilityStartBuild, npSlot, npCellX, npCellY, npDir);
+				if(ObjID != noone) with(ObjID) event(EventType.CivAbilityStartBuild, npSlot, npCellX, npCellY, npDir);
+			} else if(npType == 4) {
+				// Атака
+				var npTargetUID = buffer_read(evBuff, buffer_u16);
+				if(ObjID != noone and object_get_parent(ObjID.object_index) == Units) {
+					ObjID.Target = net_search_uid(npTargetUID);
+				}
 			}
 		}
 	break;

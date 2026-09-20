@@ -20,3 +20,32 @@ with(Civilian) {
 
 buffer_write(BUFF1, buffer_u16, 65535);
 server_send_all(BUFF1);
+
+// Проверка условия победы
+if(Status == ServerStatus.InGame and !GameOver and AlivePlayersAtStart > 1) {
+	var AliveCount = 0;
+	var WinnerSlot = -1;
+	
+	for(var i = 0; i < NET_PLAYERS; i++) {
+		if(PlrObject[i].Color == 0) continue;
+		
+		var HasCC = false;
+		with(BuildCommandCenter) {
+			if(Plr == other.PlrObject[i]) { HasCC = true; break; }
+		}
+		
+		if(HasCC) {
+			AliveCount++;
+			WinnerSlot = i;
+		} else if(!PlrObject[i].Eliminated) {
+			PlrObject[i].Eliminated = true;
+			server_chat_message(PlrObject[i].Username + " уничтожен!", -1);
+		}
+	}
+	
+	if(AliveCount <= 1) {
+		GameOver = true;
+		if(WinnerSlot >= 0) server_chat_message(PlrObject[WinnerSlot].Username + " побеждает!", -1);
+		else server_chat_message("Ничья!", -1);
+	}
+}

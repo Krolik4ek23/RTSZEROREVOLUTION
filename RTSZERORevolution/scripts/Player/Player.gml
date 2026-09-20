@@ -10,6 +10,7 @@ function Player() {
 
 	o.Cash = 0;
 	o.Energy = 0;
+	o.Eliminated = false;
 
 	return o;
 

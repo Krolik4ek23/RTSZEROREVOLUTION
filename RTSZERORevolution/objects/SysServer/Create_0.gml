@@ -27,6 +27,9 @@ for(var i = 0; i < NET_PLAYERS; i++) {
 TimerStarter = 3;
 TimerCounter = TimerStarter;
 
+GameOver = false;
+AlivePlayersAtStart = 0;
+
 enum ServerStatus {
 	Lobby,
 	InGame

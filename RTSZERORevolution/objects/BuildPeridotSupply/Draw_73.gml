@@ -1,1 +1,9 @@
 draw_sprite(sprite_index, 0, x, y);
+
+// Полоска HP
+if(HP < MaxHP and MaxHP > 0) {
+	var BarW = 44;
+	var BarY = y - sprite_get_height(sprite_index) / 2 - 6;
+	draw_rectangle_color(x - BarW / 2, BarY, x + BarW / 2, BarY + 4, c_black, c_black, c_black, c_black, 0);
+	draw_rectangle_color(x - BarW / 2 + 1, BarY + 1, x - BarW / 2 + 1 + max(0, (BarW - 2) * (HP / MaxHP)), BarY + 3, c_green, c_green, c_green, c_green, 0);
+}

@@ -1,5 +1,10 @@
 if(Status != ClientStatus.InGame) exit;
 
+// Очистка выделения от уничтоженных юнитов
+for(var j = ds_list_size(Pick) - 1; j >= 0; j--) {
+	if(!instance_exists(Pick[| j])) ds_list_delete(Pick, j);
+}
+
 var x1 = camera_get_view_x(CamID),
 	y1 = camera_get_view_y(CamID),
 	x2 = camera_get_view_width(CamID),
@@ -27,15 +32,32 @@ if(point_in_rectangle(MouseGuiX, MouseGuiY, 0, 0, 384, 384)) {
 		}
 
 		if(mouse_check_button_pressed(mb_right)) {
+			// Ищем врага под курсором
+			var EnemyTarget = noone;
+			with(Civilian) {
+				if(Plr == Game.OwnerPlayer or (Plr.Team != 0 and Plr.Team == Game.OwnerPlayer.Team)) continue;
+				if(!point_in_rectangle(MouseX, MouseY, bbox_left, bbox_top, bbox_right, bbox_bottom)) continue;
+				EnemyTarget = id;
+				break;
+			}
+			
 			network_packet(BUFF1, NetPacket.UnitControl);
 			for(var j = ds_list_size(Pick), i = 0; i < j; i++) {
 				var Unit = Pick[| i];
+				if(!instance_exists(Unit)) continue;
 				if(object_get_parent(Unit.object_index) != Units) continue;
 			
 				buffer_write(BUFF1, buffer_u16, Unit.NetUID);
-				buffer_write(BUFF1, buffer_u8, 1);
-				buffer_write(BUFF1, buffer_u16, MouseX);
-				buffer_write(BUFF1, buffer_u16, MouseY);
+				if(EnemyTarget != noone and Unit.Damage > 0) {
+					// Атака
+					buffer_write(BUFF1, buffer_u8, 4);
+					buffer_write(BUFF1, buffer_u16, EnemyTarget.NetUID);
+				} else {
+					// Движение
+					buffer_write(BUFF1, buffer_u8, 1);
+					buffer_write(BUFF1, buffer_u16, MouseX);
+					buffer_write(BUFF1, buffer_u16, MouseY);
+				}
 			}
 			buffer_write(BUFF1, buffer_u16, 0);
 			network_send(BUFF1, Socket);

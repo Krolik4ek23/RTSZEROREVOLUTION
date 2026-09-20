@@ -1,3 +1,5 @@
+event_inherited();
+
 if(point_distance(x, y, ToX, ToY) > 4) {
 	var PathNumber = path_get_number(Path);
 	if (path_get_number(Path) == 0 or 
@@ -27,4 +29,6 @@ if(instance_exists(Target)) {
 	if(ToX == Target.x and ToY == Target.y and Target.object_index == BuildFrame) {
 		if(point_distance(x, y, Target.x, Target.y) < 20 and Target.Progress < 100) Target.Progress += Target.ProgressSpeed;
 	} else Target = noone;
+} else {
+	Target = noone;
 }

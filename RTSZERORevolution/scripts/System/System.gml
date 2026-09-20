@@ -31,7 +31,8 @@ function System() {
 	Directory = environment_get_variable("APPDATA") + "\\RTSZero\\";
 	DirectoryMaps = Directory + "maps\\";
 
-	if(!directory_exists("maps")) directory_create("maps");
+	if(!directory_exists(Directory)) directory_create(Directory);
+	if(!directory_exists(DirectoryMaps)) directory_create(DirectoryMaps);
 
 #macro MouseX mouse_x
 #macro MouseY mouse_y

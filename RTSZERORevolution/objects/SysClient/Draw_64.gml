@@ -128,7 +128,7 @@ gui_text(448, 136, string(Game.OwnerPlayer.Cash) + "$", 1, PF, 1);
 if(!ds_list_empty(Pick)) {
 	var FirstUnit = Pick[| 0];
 	
-	with(FirstUnit) {
+	if(instance_exists(FirstUnit)) with(FirstUnit) {
 		var xx = 400, yy = 145;
 		for(var i = 0; i < 9; i++) {
 			if(Abilities[i] > 0) {
@@ -185,4 +185,12 @@ if(!ds_list_empty(Pick)) {
 		}
 
 	}
+}
+
+// Чат в игре
+while(ds_list_size(Chat) > 14) ds_list_delete(Chat, 0);
+gui_font(fn_default, fa_left, fa_middle);
+for(var i = ds_list_size(Chat) - 1, yy = 372; i >= 0; i--) {
+	gui_text(4, yy, Chat[| i], 1, PF, 1);
+	yy -= 10;
 }
