@@ -2,16 +2,18 @@ camera_set_view_pos(CamID, 0, -20);
 
 TileMap = ds_grid_create(MAP_W, MAP_H);
 ObjMap = ds_grid_create(MAP_W, MAP_H);
-Minimap = -1;event_user(1);
 
-ds_grid_clear(TileMap, pointer_null);
-ds_grid_clear(ObjMap, pointer_null);
+ds_grid_clear(TileMap, 0);
+ds_grid_clear(ObjMap, -1);
+
+Minimap = -1;
+event_user(1);
 
 Sidebar = [EditorSidebar.Empty];
 
 BrushSize = 0;
 BrushType = EditorBrushType.Circle;
-BrushMat = pointer_null;
+BrushMat = -1;
 
 MapName = "Unknown" + string(irandom(999));
 MapPlayers = 2;

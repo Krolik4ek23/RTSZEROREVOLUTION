@@ -1,4 +1,4 @@
-if(SERVER_SIDE and Building and Progress >= 100) {
+if(SERVER_SIDE and Building != noone and Progress >= 100) {
 	var Unit = create(Building, x, y);
 	Unit.Plr = Plr;
 	Unit.Dir = Dir;

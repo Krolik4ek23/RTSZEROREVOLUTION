@@ -11,9 +11,9 @@ if(mouseOnField and (mouse_check_button(mb_left) xor mouse_check_button(mb_right
 	var MouseCellX = MouseX div 16,
 		MouseCellY = MouseY div 16,
 		CurGrid = (Sidebar[0] == EditorSidebar.Tilesetting ? TileMap : ObjMap),
-		BrushOp = mouse_check_button(mb_left) ? BrushMat : pointer_null;
+		BrushOp = mouse_check_button(mb_left) ? BrushMat : (Sidebar[0] == EditorSidebar.Tilesetting ? 0 : -1);
 	
-	if(BrushOp != -1) {
+	if(BrushOp != -1 or mouse_check_button(mb_right)) {
 		if(BrushSize == 0) {
 			ds_grid_set(CurGrid, MouseCellX, MouseCellY, BrushOp);
 		
@@ -53,7 +53,7 @@ if(mouseOnField and (mouse_check_button(mb_left) xor mouse_check_button(mb_right
 
 var x1 = camera_get_view_x(CamID),
 	y1 = camera_get_view_y(CamID),
-	x2 = camera_get_view_height(CamID),
+	x2 = camera_get_view_width(CamID),
 	y2 = camera_get_view_height(CamID);
 
 if(keyboard_check(ord("A"))) x1 -= 4;

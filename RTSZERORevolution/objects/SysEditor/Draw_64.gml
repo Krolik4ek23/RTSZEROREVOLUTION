@@ -18,7 +18,7 @@ gui_rect(384 + 64 - MapBorder[0], 256 + 64 - MapBorder[1], 384 + 64 + MapBorder[
 if(gui_buttonIcon(4, 2, 16, 16, sprEditorIcons, EditorIcons.create, GUI_NOBG)) {
 	if(show_question("Вы действительно хотите создать новую карту?")) {
 		ds_grid_clear(TileMap, 0);
-		ds_grid_clear(ObjMap, 0);
+		ds_grid_clear(ObjMap, -1);
 		event_user(1);
 	}
 }
@@ -37,14 +37,7 @@ if(gui_buttonIcon(24, 2, 16, 16, sprEditorIcons, EditorIcons.Open, GUI_NOBG)) {
 		
 			event_user(1);
 		} else {
-			switch(Map) {
-				case MAP_ERR_FORMAT:
-					show_message("Выбранный файл не является картой игры.");
-				break;
-				case MAP_ERR_OUTDATED:
-					show_message("Данная карта создана на другой версии редактора.\nВо избежание ошибок её открытие не возможно.");
-				break;
-			}
+			show_message("Выбранный файл не является картой игры или повреждён.");
 		}
 	}
 }
@@ -74,12 +67,12 @@ gui_line(87, 2, 87, 16, P7, 0.5);
 
 if(gui_buttonIcon(92, 2, 16, 16, sprEditorIcons, EditorIcons.Objects, GUI_NOBG)) {
 	Sidebar = [EditorSidebar.Objsetting];
-	BrushMat = 0;
+	BrushMat = -1;
 }
 
 if(gui_buttonIcon(112, 2, 16, 16, sprEditorIcons, EditorIcons.Tiles, GUI_NOBG)) {
 	Sidebar = [EditorSidebar.Tilesetting];
-	BrushMat = 0;
+	BrushMat = -1;
 }
 
 

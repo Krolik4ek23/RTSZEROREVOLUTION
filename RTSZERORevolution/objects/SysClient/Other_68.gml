@@ -19,14 +19,11 @@ switch(evType) {
     exit;
     
     case network_type_disconnect:
-        show_debug_message("=== CLIENT: disconnected ===");
     exit;
     
     case network_type_data:
         var evBuff = async_load[? "buffer"];
         var evPacket = buffer_read(evBuff, buffer_u8);
-        
-        show_debug_message("=== CLIENT: packet received = " + string(evPacket) + " ===");
     break;
     
     default: exit;
@@ -79,47 +76,22 @@ switch(evPacket) {
     break;
     
     case NetPacket.MapTransfer:
-        show_debug_message("=== CLIENT: MapTransfer received! ===");
-        show_debug_message("Buffer size: " + string(buffer_get_size(evBuff)));
-        show_debug_message("Buffer position: " + string(buffer_tell(evBuff)));
-        
-        var npMapname = buffer_read(evBuff, buffer_string);   // ← имя СНАЧАЛА
-        show_debug_message("Map name: '" + npMapname + "'");
-        
-        var npMap = map_read(evBuff);                          // ← карта ПОСЛЕ
-        
-        show_debug_message("map_read returned: " + string(npMap));
-        show_debug_message("is_array: " + string(is_array(npMap)));
+        var npMapname = buffer_read(evBuff, buffer_string);
+        var npMap = map_read(evBuff);
         
         if (is_array(npMap)) {
-            show_debug_message("=== CLIENT: Map loaded, going to game ===");
-            
             TileMap = npMap[0];
             ObjMap = npMap[1];
-            
             event_user(1);
-            
             Status = ClientStatus.InGame;
-        } else {
-            show_debug_message("=== CLIENT: map_read FAILED: " + string(npMap) + " ===");
-            switch (npMap) {
-                case MAP_ERR_FORMAT:
-                    show_debug_message("Reason: MAP_ERR_FORMAT");
-                break;
-                case MAP_ERR_OUTDATED:
-                    show_debug_message("Reason: MAP_ERR_OUTDATED");
-                break;
-                default:
-                    show_debug_message("Reason: UNKNOWN");
-            }
         }
     break;
     
     case NetPacket.UnitSync:
         with(Civilian) IsAlive = false;
         while(true) {
-            var npObjOID = buffer_read(evBuff, buffer_u8);
-            if(!npObjOID) break;
+            var npObjOID = buffer_read(evBuff, buffer_u16);
+            if(npObjOID == 65535) break;
             
             var npObjUID = buffer_read(evBuff, buffer_u16);
             var npObjHP = buffer_read(evBuff, buffer_u16);

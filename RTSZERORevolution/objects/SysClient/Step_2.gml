@@ -2,7 +2,7 @@ if(Status != ClientStatus.InGame) exit;
 
 var x1 = camera_get_view_x(CamID),
 	y1 = camera_get_view_y(CamID),
-	x2 = camera_get_view_height(CamID),
+	x2 = camera_get_view_width(CamID),
 	y2 = camera_get_view_height(CamID);
 
 if(keyboard_check(ord("A"))) x1 -= 4;

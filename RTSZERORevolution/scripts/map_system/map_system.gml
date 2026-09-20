@@ -1,2 +1,1 @@
 #macro MAP_ERR_FORMAT -1
-#macro MAP_ERR_OUTDATED -2

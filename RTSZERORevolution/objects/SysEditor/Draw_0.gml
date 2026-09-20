@@ -6,20 +6,20 @@ draw_rectangle_color(1024 - (MapBorder[0] * 16), 1024 - (MapBorder[1] * 16), 102
 {
 	var x1 = clamp(camera_get_view_x(CamID) div 16, 0, MAP_W),
 		y1 = clamp(camera_get_view_y(CamID) div 16, 0, MAP_H),
-		x2 = clamp(x1 + (camera_get_view_height(CamID) div 16) + 1, 0, MAP_W),
+		x2 = clamp(x1 + (camera_get_view_width(CamID) div 16) + 1, 0, MAP_W),
 		y2 = clamp(y1 + (camera_get_view_height(CamID) div 16) + 1, 0, MAP_H);
 
 	for(var xx = x1; xx < x2; xx++) {
 		for(var yy = y1; yy < y2; yy++) {
 			var Tile = TileMap[# xx, yy];
-			if (Tile != pointer_null) draw_sprite(Tile, Tile == tlWater ? -1 : 0, xx * 16, yy * 16);
+			if (Tile) draw_sprite(Tile, Tile == tlWater ? -1 : 0, xx * 16, yy * 16);
 		}
 	}
 
 	for(var xx = x1; xx < x2; xx++) {
 		for(var yy = y1; yy < y2; yy++) {
 			var Tile = TileMap[# xx, yy];
-			if (Tile != pointer_null and Tile != tlWater) {
+			if (Tile and Tile != tlWater) {
 				if(xx + 1 < MAP_W and Tile < TileMap[# xx + 1, yy]) draw_sprite(Tile, 1, xx * 16 + 16, yy * 16);
 				if(xx + 1 < MAP_W and yy - 1 > 0 and Tile < TileMap[# xx + 1, yy - 1]) draw_sprite(Tile, 2, xx * 16 + 16, yy * 16 - 16);
 				if(yy - 1 > 0 and Tile < TileMap[# xx, yy - 1]) draw_sprite(Tile, 3, xx * 16, yy * 16 - 16);
@@ -36,7 +36,6 @@ draw_rectangle_color(1024 - (MapBorder[0] * 16), 1024 - (MapBorder[1] * 16), 102
 		for(var yy = y1; yy < y2; yy++) {
 			var Tile = ObjMap[# xx, yy];
 		
-			if (Tile == pointer_null) continue;
 			if (!object_exists(Tile)) continue;
 		
 			Tile = object_get_sprite(Tile);

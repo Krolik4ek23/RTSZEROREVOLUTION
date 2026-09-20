@@ -1,4 +1,4 @@
-if(Building) {
+if(Building != noone) {
 	draw_sprite_ext(object_get_sprite(Building), 0, x, y, 1, 1, 90 * Dir, c_white, 0.8);
 }
 

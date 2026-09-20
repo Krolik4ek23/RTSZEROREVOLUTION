@@ -1,93 +1,75 @@
 ///@param buff
 function map_read(argument0) {
-    var Map = argument0;
+	var Map = argument0;
+	var header = buffer_read(Map, buffer_string);
 
-    show_debug_message("=== map_read START ===");
-    show_debug_message("Buffer size: " + string(buffer_get_size(Map)));
-    show_debug_message("Buffer position: " + string(buffer_tell(Map)));
+	var tileCount, objCount, TileLut, ObjLut, i, v, idx;
+	var CompressedDataSize, RawData, DecompressedData, tileGrid, objGrid, xx, yy;
 
-    // --- ЗАГОЛОВОК ---
-    var header = buffer_read(Map, buffer_string);
-    show_debug_message("Header: '" + header + "'");
-    if (header != "RTS0") {
-        show_debug_message("!!! BAD HEADER");
-        return MAP_ERR_FORMAT;
-    }
+	if (header == "RTS1") {
+		// --- НОВЫЙ ФОРМАТ ---
+		tileCount = buffer_read(Map, buffer_u16);
+		TileLut = array_create(tileCount + 1, 0);
+		for (i = 1; i <= tileCount; i++) {
+			idx = asset_get_index(buffer_read(Map, buffer_string));
+			TileLut[i] = (idx < 0 ? 0 : idx);
+		}
 
-    // --- ВЕРСИЯ ---
-    var ver = buffer_read(Map, buffer_string);
-    show_debug_message("Version: '" + ver + "', expected: '" + Game.Version + "'");
-    if (ver != Game.Version) {
-        show_debug_message("!!! BAD VERSION");
-        return MAP_ERR_OUTDATED;
-    }
+		objCount = buffer_read(Map, buffer_u16);
+		ObjLut = array_create(objCount + 1, -1);
+		for (i = 1; i <= objCount; i++) {
+			idx = asset_get_index(buffer_read(Map, buffer_string));
+			ObjLut[i] = (idx < 0 ? -1 : idx);
+		}
+	} else if (header == "RTS0") {
+		// --- СТАРЫЙ ФОРМАТ (строка версии читается, но игнорируется) ---
+		buffer_read(Map, buffer_string); // version
 
-    // --- СПРАЙТЫ ---
-    var SId2Name = [0], OId2Name = [0];
-    while (true) {
-        var Val = buffer_read(Map, buffer_u8);
-        if (!Val) break;
-        SId2Name[Val] = asset_get_index(buffer_read(Map, buffer_string));
-    }
-    show_debug_message("Sprites read: " + string(array_length(SId2Name)));
-    show_debug_message("Position after sprites: " + string(buffer_tell(Map)));
+		TileLut = [0];
+		while (true) {
+			v = buffer_read(Map, buffer_u8);
+			if (!v) break;
+			idx = asset_get_index(buffer_read(Map, buffer_string));
+			TileLut[v] = (idx < 0 ? 0 : idx);
+		}
 
-    // --- ОБЪЕКТЫ ---
-    while (true) {
-        var Val = buffer_read(Map, buffer_u8);
-        if (!Val) break;
-        OId2Name[Val] = asset_get_index(buffer_read(Map, buffer_string));
-    }
-    show_debug_message("Objects read: " + string(array_length(OId2Name)));
-    show_debug_message("Position after objects: " + string(buffer_tell(Map)));
+		ObjLut = [-1];
+		while (true) {
+			v = buffer_read(Map, buffer_u8);
+			if (!v) break;
+			idx = asset_get_index(buffer_read(Map, buffer_string));
+			ObjLut[v] = (idx < 0 ? -1 : idx);
+		}
+	} else {
+		return MAP_ERR_FORMAT;
+	}
 
-    // --- РАЗМЕР СЖАТЫХ ДАННЫХ ---
-    var CompressedDataSize = buffer_read(Map, buffer_u32);
-    show_debug_message("Compressed size: " + string(CompressedDataSize));
+	// --- СЖАТЫЕ ДАННЫЕ ---
+	CompressedDataSize = buffer_read(Map, buffer_u32);
+	if (CompressedDataSize > buffer_get_size(Map) - buffer_tell(Map)) {
+		return MAP_ERR_FORMAT;
+	}
 
-    var bytesLeft = buffer_get_size(Map) - buffer_tell(Map);
-    show_debug_message("Bytes left: " + string(bytesLeft));
+	RawData = buffer_create(CompressedDataSize, buffer_grow, 1);
+	buffer_copy(Map, buffer_tell(Map), CompressedDataSize, RawData, 0);
+	buffer_seek(Map, buffer_seek_relative, CompressedDataSize);
+	DecompressedData = buffer_decompress(RawData);
+	buffer_delete(RawData);
+	if (!buffer_exists(DecompressedData)) {
+		return MAP_ERR_FORMAT;
+	}
 
-    if (CompressedDataSize > bytesLeft) {
-        show_debug_message("!!! NOT ENOUGH DATA");
-        return MAP_ERR_FORMAT;
-    }
+	tileGrid = ds_grid_create(MAP_W, MAP_H);
+	objGrid = ds_grid_create(MAP_W, MAP_H);
 
-    // --- КОПИРОВАНИЕ СЖАТЫХ ДАННЫХ ---
-    var RawData = buffer_create(CompressedDataSize, buffer_grow, 1);
-    buffer_copy(Map, buffer_tell(Map), CompressedDataSize, RawData, 0);
-    buffer_seek(Map, buffer_seek_relative, CompressedDataSize);   // ← ФИКС: сдвигаем курсор!
+	for (xx = 0; xx < MAP_W; xx++)
+		for (yy = 0; yy < MAP_H; yy++)
+			tileGrid[# xx, yy] = TileLut[buffer_read(DecompressedData, buffer_u8)];
 
-    show_debug_message("Position after compressed data: " + string(buffer_tell(Map)));
+	for (xx = 0; xx < MAP_W; xx++)
+		for (yy = 0; yy < MAP_H; yy++)
+			objGrid[# xx, yy] = ObjLut[buffer_read(DecompressedData, buffer_u8)];
 
-    // --- РАСПАКОВКА ---
-    var DecompressedData = buffer_decompress(RawData);
-    buffer_delete(RawData);
-
-    if (!buffer_exists(DecompressedData)) {
-        show_debug_message("!!! DECOMPRESS FAILED");
-        return MAP_ERR_FORMAT;
-    }
-
-    show_debug_message("Decompressed size: " + string(buffer_get_size(DecompressedData)));
-    show_debug_message("Expected size: " + string(MAP_W * MAP_H * 2));
-
-    // --- ЧТЕНИЕ СЕТОК ---
-    var tileGrid = ds_grid_create(MAP_W, MAP_H),
-        objGrid  = ds_grid_create(MAP_W, MAP_H);
-
-    for (var xx = 0; xx < MAP_W; xx++)
-        for (var yy = 0; yy < MAP_H; yy++)
-            tileGrid[# xx, yy] = SId2Name[buffer_read(DecompressedData, buffer_u8)];
-
-    for (var xx = 0; xx < MAP_W; xx++)
-        for (var yy = 0; yy < MAP_H; yy++)
-            objGrid[# xx, yy] = OId2Name[buffer_read(DecompressedData, buffer_u8)];
-
-    buffer_delete(DecompressedData);
-
-    show_debug_message("=== map_read SUCCESS ===");
-    show_debug_message("Final position: " + string(buffer_tell(Map)));
-
-    return [tileGrid, objGrid];
+	buffer_delete(DecompressedData);
+	return [tileGrid, objGrid];
 }

@@ -5,7 +5,7 @@ function editor_minimap_refresh(argument0, argument1)
 
     var Tile = ObjMap[# XX, YY];
 
-    if (Tile)
+    if (object_exists(Tile))
     {
         var Spr = object_get_sprite(Tile);
 

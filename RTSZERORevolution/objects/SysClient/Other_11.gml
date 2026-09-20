@@ -19,7 +19,7 @@ for(var xx = 0; xx < MAP_W; xx++) {
 for(var xx = 0; xx < MAP_W; xx++) {
 	for(var yy = 0; yy < MAP_H; yy++) {
 		var Tile = ObjMap[# xx, yy];
-		if(!Tile) continue;
+		if (!object_exists(Tile)) continue;
 		if(object_is_ancestor(Tile, Civilian)) continue;
 		
 		create(Tile, xx * 16, yy * 16);
@@ -36,7 +36,7 @@ draw_clear(0);
 for(var xx = 0; xx < MAP_W; xx++) {
 	for(var yy = 0; yy < MAP_H; yy++) {
 		var Tile = ObjMap[# xx, yy];
-		if(Tile and !object_is_ancestor(Tile, Civilian)) {
+		if (object_exists(Tile) and !object_is_ancestor(Tile, Civilian)) {
 			Tile = object_get_sprite(Tile);
 			draw_sprite_ext(Tile, 0, xx, yy, 1/sprite_get_width(Tile), 1/sprite_get_height(Tile), 0, c_white, 1);
 		} else {

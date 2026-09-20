@@ -4,7 +4,7 @@ draw_clear(0);
 
 var x1 = clamp(camera_get_view_x(CamID) div 16, 0, MAP_W),
 	y1 = clamp(camera_get_view_y(CamID) div 16, 0, MAP_H),
-	x2 = clamp(x1 + (camera_get_view_height(CamID) div 16) + 1, 0, MAP_W),
+	x2 = clamp(x1 + (camera_get_view_width(CamID) div 16) + 1, 0, MAP_W),
 	y2 = clamp(y1 + (camera_get_view_height(CamID) div 16) + 1, 0, MAP_H);
 
 for(var xx = x1; xx < x2; xx++) {
