@@ -16,7 +16,7 @@ function map_write(argument0, argument1, argument2) {
     buffer_write(Map, buffer_string, Game.Version);
     show_debug_message("After header — position: " + string(buffer_tell(Map)));
 
-    // --- СПРАЙТЫ ТАЙЛОВ (с 1, а не с 0) ---
+    // --- СПРАЙТЫ ТАЙЛОВ ---
     var spriteCount = 0;
     for (var i = 1; sprite_exists(i); i++) {
         var j = sprite_get_name(i);
@@ -29,20 +29,19 @@ function map_write(argument0, argument1, argument2) {
     show_debug_message("Sprites written: " + string(spriteCount));
     show_debug_message("After sprites — position: " + string(buffer_tell(Map)));
 
-    // --- ОБЪЕКТЫ (с 1, а не с 0) ---
+    // --- ОБЪЕКТЫ ---
     var objectCount = 0;
     for (var i = 1; object_exists(i); i++) {
         var j = object_get_name(i);
         if (i == Units or i == Builds) continue;
         
-        // --- РАЗРЕШИТЬ СОХРАНЕНИЕ БАЗ ИГРОКОВ ---
+        // --- РАЗРЕШИТЬ СОХРАНЕНИЕ БАЗ ---
         if (i == BuildCommandCenter or i == BuildPeridotSupply) {
             buffer_write(Map, buffer_u8, i);
             buffer_write(Map, buffer_string, j);
             objectCount++;
             continue;
         }
-        // ----------------------------------------
         
         if (!object_is_ancestor(i, Civilian) and
             !object_is_ancestor(i, Terrains)) continue;
@@ -60,13 +59,21 @@ function map_write(argument0, argument1, argument2) {
 
     var RawData = buffer_create(RawDataSize, buffer_grow, 1);
 
+    // --- tileGrid с защитой от pointer_null ---
     for (var xx = 0; xx < MAP_W; xx++)
-        for (var yy = 0; yy < MAP_H; yy++)
-            buffer_write(RawData, buffer_u8, tileGrid[# xx, yy]);
+        for (var yy = 0; yy < MAP_H; yy++) {
+            var val = tileGrid[# xx, yy];
+            if (!is_real(val)) val = 0;
+            buffer_write(RawData, buffer_u8, val);
+        }
 
+    // --- objGrid с защитой от pointer_null ---
     for (var xx = 0; xx < MAP_W; xx++)
-        for (var yy = 0; yy < MAP_H; yy++)
-            buffer_write(RawData, buffer_u8, objGrid[# xx, yy]);
+        for (var yy = 0; yy < MAP_H; yy++) {
+            var val = objGrid[# xx, yy];
+            if (!is_real(val)) val = 0;
+            buffer_write(RawData, buffer_u8, val);
+        }
 
     show_debug_message("RawData position: " + string(buffer_tell(RawData)));
     show_debug_message("RawData size: " + string(buffer_get_size(RawData)));
