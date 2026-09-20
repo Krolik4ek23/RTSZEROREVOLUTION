@@ -7,11 +7,11 @@ if(mouse_check_button(vk_lcontrol)) {
 	if(mouse_wheel_down() and BrushSize > 0) BrushSize--;
 }
 
-if(mouseOnField) {
+if(mouseOnField and (mouse_check_button(mb_left) xor mouse_check_button(mb_right))) {
 	var MouseCellX = MouseX div 16,
 		MouseCellY = MouseY div 16,
 		CurGrid = (Sidebar[0] == EditorSidebar.Tilesetting ? TileMap : ObjMap),
-		BrushOp = mouse_check_button(mb_left) ? BrushMat : (mouse_check_button(mb_right) ? 0 : -1);
+		BrushOp = mouse_check_button(mb_left) ? BrushMat : pointer_null;
 	
 	if(BrushOp != -1) {
 		if(BrushSize == 0) {
