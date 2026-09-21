@@ -109,10 +109,18 @@ switch(Sidebar[0]) {
 			if(MapPlayers < 8) MapPlayers++ else MapPlayers = 2;
 		}
 		
+		if(gui_buttonText(398, 150, 100, 12, "Создать карту", 0)) {
+			if(show_question("Сгенерировать карту на 2 игроков (река + 2 пути)?")) {
+				map_generate(TileMap, ObjMap);
+				event_user(1);
+			}
+		}
+		
 		gui_font(fn_default, fa_left, fa_bottom);
 		gui_text(398, 58, "Название карты:", 1, PF, 1);
 		gui_text(398, 88, "Границы карты:", 1, PF, 1);
 		gui_text(398, 118, "Максимум игроков:", 1, PF, 1);
+		gui_text(398, 148, "Генератор (река + 2 пути):", 1, PF, 1);
 	break;
 	#endregion
 	#region Тайлсеттинг

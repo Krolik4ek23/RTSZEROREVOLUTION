@@ -17,7 +17,7 @@ function map_write(argument0, argument1, argument2) {
 	}
 
 	// --- ТАБЛИЦА ОБЪЕКТОВ ---
-	var Objs = [TerrainWall, BuildCommandCenter, BuildPeridotSupply];
+	var Objs = [TerrainWall, TerrainWater, BuildCommandCenter, BuildPeridotSupply];
 	buffer_write(Map, buffer_u16, array_length(Objs));
 	for (var i = 0; i < array_length(Objs); i++) {
 		buffer_write(Map, buffer_string, object_get_name(Objs[i]));
