@@ -32,11 +32,12 @@ if(point_distance(x, y, ToX, ToY) > 4) {
 	}
 }
 
+// Плавный поворот башни к цели атаки (без резких поворотов)
+var TurretDir = BaseDir;
 if(instance_exists(Target) and Damage > 0) {
-	PushDir -= angle_difference(PushDir, point_direction(x, y, Target.x, Target.y)) / 6;
-} else {
-	PushDir = BaseDir;
+	TurretDir = point_direction(x, y, Target.x, Target.y);
 }
+PushDir -= clamp(angle_difference(PushDir, TurretDir), -2.5, 2.5);
 
 // Следы гусениц (только на клиенте и для видимых танков)
 if(!SERVER_SIDE and (Plr == Game.OwnerPlayer or (Plr.Team != 0 and Plr.Team == Game.OwnerPlayer.Team) or Game.FogGrid[# x div 16, y div 16])) {

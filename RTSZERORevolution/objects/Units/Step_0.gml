@@ -3,6 +3,12 @@
 
 if(Damage <= 0) exit;
 
+// Приказ движения — просто едем к точке, не атакуем, пока не доедем
+if(MoveOrder) {
+	if(point_distance(x, y, ToX, ToY) > 4) exit;
+	MoveOrder = false;
+}
+
 // Проверяем цель; при её отсутствии — автоатака ближайшего врага
 if(!instance_exists(Target) or Target.Plr == Plr or (Plr.Team != 0 and Plr.Team == Target.Plr.Team)) {
 	Target = noone;

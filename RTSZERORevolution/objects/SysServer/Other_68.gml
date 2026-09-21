@@ -167,6 +167,7 @@ switch(evPacket) {
 					ObjID.ToX = npToX;
 					ObjID.ToY = npToY;
 					ObjID.Target = noone;
+					ObjID.MoveOrder = true;
 				}
 			} else if(npType == 2) {
 				// Старт способности
@@ -185,6 +186,7 @@ switch(evPacket) {
 				if(ObjID != noone and object_get_parent(ObjID.object_index) == Units) {
 					ObjID.Target = net_search_uid(npTargetUID);
 					ObjID.AutoTarget = false;
+					ObjID.MoveOrder = false;
 				}
 			} else if(npType == 5) {
 				// Достройка (бульдозер)
