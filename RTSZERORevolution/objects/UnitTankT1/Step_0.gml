@@ -9,8 +9,19 @@ if(point_distance(x, y, ToX, ToY) > 4) {
 			// Сглаживание пути (стены + здания)
 			var i = 0;
 			while(i < path_get_number(Path) - 2) {
-				if(!collision_line(path_get_point_x(Path, i), path_get_point_y(Path, i), path_get_point_x(Path, i + 2), path_get_point_y(Path, i + 2), Terrains, false, false) and
-				   !collision_line(path_get_point_x(Path, i), path_get_point_y(Path, i), path_get_point_x(Path, i + 2), path_get_point_y(Path, i + 2), Builds, false, false)) {
+				var X1 = path_get_point_x(Path, i),
+					Y1 = path_get_point_y(Path, i),
+					X2 = path_get_point_x(Path, i + 2),
+					Y2 = path_get_point_y(Path, i + 2),
+					R = 5;
+				if(!collision_line(X1 - R, Y1 - R, X2 - R, Y2 - R, Terrains, false, false) and
+				   !collision_line(X1 - R, Y1 - R, X2 - R, Y2 - R, Builds, false, false) and
+				   !collision_line(X1 + R, Y1 - R, X2 + R, Y2 - R, Terrains, false, false) and
+				   !collision_line(X1 + R, Y1 - R, X2 + R, Y2 - R, Builds, false, false) and
+				   !collision_line(X1 - R, Y1 + R, X2 - R, Y2 + R, Terrains, false, false) and
+				   !collision_line(X1 - R, Y1 + R, X2 - R, Y2 + R, Builds, false, false) and
+				   !collision_line(X1 + R, Y1 + R, X2 + R, Y2 + R, Terrains, false, false) and
+				   !collision_line(X1 + R, Y1 + R, X2 + R, Y2 + R, Builds, false, false)) {
 					path_delete_point(Path, i + 1);
 				} else {
 					i++;
@@ -25,7 +36,20 @@ if(point_distance(x, y, ToX, ToY) > 4) {
 			PointDir = point_direction(x, y, PointX, PointY);
 		
 		if(point_distance(x, y, PointX, PointY) > 2) {
+			var OldX = x, OldY = y;
 			move_contact_solid(PointDir, 0.8);
+			// Если упёрлись в препятствие — скользим вдоль него
+			if(point_distance(OldX, OldY, x, y) < 0.4) {
+				move_contact_solid(PointDir + 90, 0.8);
+				if(point_distance(OldX, OldY, x, y) < 0.4) {
+					x = OldX; y = OldY;
+					move_contact_solid(PointDir - 90, 0.8);
+				}
+			}
+			// Если так и не сдвинулись — пересчитываем путь
+			if(point_distance(OldX, OldY, x, y) < 0.1) {
+				path_clear_points(Path);
+			}
 		} else path_delete_point(Path, 0);
 		
 		BaseDir -= angle_difference(BaseDir, PointDir) / 6;
