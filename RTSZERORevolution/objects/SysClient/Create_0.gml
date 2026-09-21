@@ -41,6 +41,11 @@ OwnerSlot = 0;
 
 Pick = ds_list_create();
 
+DragActive = false;
+DragStartX = 0;
+DragStartY = 0;
+DragCtrl = false;
+
 camera_set_view_pos(CamID, 0, 0);
 camera_set_view_size(CamID, 512, 384);
 

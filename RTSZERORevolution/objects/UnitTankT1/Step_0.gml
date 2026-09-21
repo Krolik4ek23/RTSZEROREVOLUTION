@@ -3,12 +3,21 @@ event_inherited();
 if(point_distance(x, y, ToX, ToY) > 4) {
 	var PathNumber = path_get_number(Path);
 	if (path_get_number(Path) == 0 or 
-		(path_get_point_x(Path, PathNumber - 1) != ToX or path_get_point_y(Path, PathNumber - 1) != ToY)) {
+		point_distance(path_get_point_x(Path, PathNumber - 1), path_get_point_y(Path, PathNumber - 1), ToX, ToY) > 12) {
 	
-		if(!mp_grid_path(Game.MapCollision, Path, x, y, ToX, ToY, true)) {
-			ToX = x; ToY = y;
+		if(mp_grid_path(Game.MapCollision, Path, x, y, ToX, ToY, true)) {
+			// Сглаживание пути (стены + здания)
+			var i = 0;
+			while(i < path_get_number(Path) - 2) {
+				if(!collision_line(path_get_point_x(Path, i), path_get_point_y(Path, i), path_get_point_x(Path, i + 2), path_get_point_y(Path, i + 2), Terrains, false, false) and
+				   !collision_line(path_get_point_x(Path, i), path_get_point_y(Path, i), path_get_point_x(Path, i + 2), path_get_point_y(Path, i + 2), Builds, false, false)) {
+					path_delete_point(Path, i + 1);
+				} else {
+					i++;
+				}
+			}
 		} else {
-			path_optimize(Path, 16, Terrains);
+			ToX = x; ToY = y;
 		}
 	} else {
 		var PointX = path_get_point_x(Path, 0),
@@ -16,9 +25,7 @@ if(point_distance(x, y, ToX, ToY) > 4) {
 			PointDir = point_direction(x, y, PointX, PointY);
 		
 		if(point_distance(x, y, PointX, PointY) > 2) {
-			if(abs(angle_difference(BaseDir, PointDir)) < 4) {
-				move_contact_solid(PointDir, 0.8);
-			}
+			move_contact_solid(PointDir, 0.8);
 		} else path_delete_point(Path, 0);
 		
 		BaseDir -= angle_difference(BaseDir, PointDir) / 6;

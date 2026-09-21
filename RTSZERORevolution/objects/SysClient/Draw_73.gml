@@ -46,6 +46,18 @@ if(!ds_list_empty(Pick)) {
 	}
 }
 
+// Рамка выделения (зелёная, как в C&C Generals)
+if(DragActive) {
+	var X1 = min(DragStartX, MouseX), Y1 = min(DragStartY, MouseY);
+	var X2 = max(DragStartX, MouseX), Y2 = max(DragStartY, MouseY);
+	draw_set_alpha(0.15);
+	draw_set_color(c_green);
+	draw_rectangle(X1, Y1, X2, Y2, false);
+	draw_set_alpha(1);
+	draw_rectangle(X1, Y1, X2, Y2, true);
+	draw_set_color(c_white);
+}
+
 gpu_set_tex_filter(true);
 draw_surface_stretched(SurfShroud, 0, 0, MAP_W * 16, MAP_H * 16);
 gpu_set_tex_filter(false);

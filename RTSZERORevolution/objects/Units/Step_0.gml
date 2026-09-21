@@ -3,58 +3,78 @@
 
 if(Damage <= 0) exit;
 
-if(!instance_exists(Target)) {
+// Проверяем цель; при её отсутствии — автоатака ближайшего врага
+if(!instance_exists(Target) or Target.Plr == Plr or (Plr.Team != 0 and Plr.Team == Target.Plr.Team)) {
 	Target = noone;
-	exit;
-}
-
-// Не атакуем своих
-if(Target.Plr == Plr or (Plr.Team != 0 and Plr.Team == Target.Plr.Team)) {
-	Target = noone;
-	exit;
+	AutoTarget = false;
+	
+	Nearest = noone;
+	NearestDist = AttackRange;
+	with(Civilian) {
+		if(Plr == Game.NeutralPlayer) continue;
+		if(Plr == other.Plr or (other.Plr.Team != 0 and other.Plr.Team == Plr.Team)) continue;
+		if(point_distance(x, y, other.x, other.y) < other.NearestDist) {
+			other.NearestDist = point_distance(x, y, other.x, other.y);
+			other.Nearest = id;
+		}
+	}
+	Target = Nearest;
+	AutoTarget = (Target != noone);
+	if(Target == noone) exit;
 }
 
 var Dist = point_distance(x, y, Target.x, Target.y);
 
+// Проверка прямой видимости (не стреляем сквозь стены и здания),
+// сама цель из проверки исключается
+var LOS = true;
 if(Dist <= AttackRange) {
-	// Проверка прямой видимости (не стреляем сквозь стены и здания)
-	var LineDir = point_direction(x, y, Target.x, Target.y);
-	var LineEndX = Target.x - lengthdir_x(Target.OutlineRadius, LineDir);
-	var LineEndY = Target.y - lengthdir_y(Target.OutlineRadius, LineDir);
-	
-	if(collision_line(x, y, LineEndX, LineEndY, Terrains, false, false) or
-	   collision_line(x, y, LineEndX, LineEndY, Builds, false, false)) {
-		// Нет прямой видимости — подъезжаем в обход
-		ToX = Target.x;
-		ToY = Target.y;
-		AttackCooldown = 0;
+	ds_list_clear(Game.LOSList);
+	collision_line_list(x, y, Target.x, Target.y, Terrains, false, false, Game.LOSList, true);
+	collision_line_list(x, y, Target.x, Target.y, Builds, false, false, Game.LOSList, true);
+	var N = ds_list_size(Game.LOSList);
+	for(var i = 0; i < N; i++) {
+		if(Game.LOSList[| i] != Target) { LOS = false; break; }
+	}
+}
+
+if(Dist <= AttackRange and LOS) {
+	// Стреляем на ходу (не останавливаемся)
+	if(AttackCooldown > 0) {
+		AttackCooldown -= 1;
 	} else {
-		// Останавливаемся и атакуем
-		ToX = x;
-		ToY = y;
-		
-		BaseDir -= angle_difference(BaseDir, point_direction(x, y, Target.x, Target.y)) / 6;
-		
-		if(AttackCooldown > 0) {
-			AttackCooldown -= 1;
-		} else {
-			AttackCooldown = AttackSpeed;
-			if(SERVER_SIDE) {
-				with(Target) {
+		AttackCooldown = AttackSpeed;
+		if(SERVER_SIDE) {
+			with(Target) {
+				if(object_index == BuildFrame) {
+					// Атака по недостроенному зданию — сбиваем процент стройки
+					Progress -= (other.Damage / MaxHP) * 100;
+					if(Progress <= 0) instance_destroy(self, false);
+				} else {
 					HP -= other.Damage;
 					if(HP <= 0) instance_destroy(self, false);
 				}
-			} else if(Plr == Game.OwnerPlayer or (Plr.Team != 0 and Plr.Team == Game.OwnerPlayer.Team) or Game.FogGrid[# x div 16, y div 16]) {
-				// Визуальный выстрел (только если стрелок видим)
-				var Shot = create(ObjShot, x, y);
-				Shot.ToX = Target.x;
-				Shot.ToY = Target.y;
 			}
+		} else if(Plr == Game.OwnerPlayer or (Plr.Team != 0 and Plr.Team == Game.OwnerPlayer.Team) or Game.FogGrid[# x div 16, y div 16]) {
+			// Визуальный выстрел (только если стрелок видим)
+			var Shot = create(ObjShot, x, y);
+			Shot.ToX = Target.x;
+			Shot.ToY = Target.y;
 		}
 	}
+} else if(AutoTarget) {
+	// Автоцель вне радиуса или без линии огня — теряем её (продолжаем движение)
+	Target = noone;
+	AutoTarget = false;
 } else {
-	// Преследуем цель
-	ToX = Target.x;
-	ToY = Target.y;
+	// Приближаемся к цели на дистанцию атаки.
+	// Для зданий цель — край здания (иначе mp_grid не проложит путь в центр).
+	var AppDir = point_direction(Target.x, Target.y, x, y);
+	var AppDist = AttackRange - 24;
+	if(object_get_parent(Target.object_index) == Builds) {
+		AppDist = max(AppDist, (Target.sprite_width + Target.sprite_height) / 4 + 8);
+	}
+	ToX = Target.x + lengthdir_x(AppDist, AppDir);
+	ToY = Target.y + lengthdir_y(AppDist, AppDir);
 	AttackCooldown = 0;
 }

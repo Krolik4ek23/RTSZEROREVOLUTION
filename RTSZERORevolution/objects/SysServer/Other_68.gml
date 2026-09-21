@@ -184,6 +184,16 @@ switch(evPacket) {
 				var npTargetUID = buffer_read(evBuff, buffer_u16);
 				if(ObjID != noone and object_get_parent(ObjID.object_index) == Units) {
 					ObjID.Target = net_search_uid(npTargetUID);
+					ObjID.AutoTarget = false;
+				}
+			} else if(npType == 5) {
+				// Достройка (бульдозер)
+				var npTargetUID = buffer_read(evBuff, buffer_u16);
+				if(ObjID != noone and object_get_parent(ObjID.object_index) == Units) {
+					var npTarget = net_search_uid(npTargetUID);
+					if(npTarget != noone and npTarget.object_index == BuildFrame and npTarget.Plr == ObjID.Plr) {
+						ObjID.Target = npTarget;
+					}
 				}
 			}
 		}

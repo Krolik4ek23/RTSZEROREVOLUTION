@@ -2,6 +2,7 @@ event_inherited();
 
 IgnoreCollisionBuilds = true;
 Target = noone;
+AutoTarget = false;
 
 // Боевые характеристики (переопределяются в конкретных юнитах)
 Damage = 0;

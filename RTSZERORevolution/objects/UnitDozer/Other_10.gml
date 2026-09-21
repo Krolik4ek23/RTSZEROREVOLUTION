@@ -50,10 +50,18 @@ switch(EVENT[0]) {
 			Unit.ProgressSpeed = 1.6 / Game.AbilitiesTime[AbilityID];
 			Unit.Plr = Plr;
 			Unit.Dir = D;
+			// Маска = реальный размер здания (иначе можно накладывать здания друг на друга)
+			Unit.mask_index = BuildSpr;
+			// HP пропорционален проценту стройки (полный HP — только после постройки)
+			Unit.MaxHP = (AbilityID == Ability.CommandCenter ? 3000 : 1000);
+			Unit.HP = 1;
 		
 			Target = Unit;
-			ToX = Unit.x;
-			ToY = Unit.y;
+			// Едем к краю постройки (не в центр — иначе упрёмся в коллизию)
+			var BRange = max(sprite_get_width(BuildSpr), sprite_get_height(BuildSpr)) / 2 + 16;
+			var AppDir = point_direction(Unit.x, Unit.y, x, y);
+			ToX = Unit.x + lengthdir_x(BRange - 4, AppDir);
+			ToY = Unit.y + lengthdir_y(BRange - 4, AppDir);
 		}
 	break;
 }

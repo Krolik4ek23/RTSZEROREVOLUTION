@@ -137,6 +137,7 @@ function System() {
 #endregion
 
 	MapCollision = mp_grid_create(0, 0, MAP_W, MAP_H, 16, 16);
+	LOSList = ds_list_create();
 
 	OwnerPlayer = Player();
 	NeutralPlayer = Player();
