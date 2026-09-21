@@ -1,13 +1,21 @@
 if(Status != ClientStatus.InGame) exit;
 
-with(Civilian) event_perform(ev_draw, ev_draw_begin);
+with(Civilian) {
+	if(Plr == Game.OwnerPlayer or (Plr.Team != 0 and Plr.Team == Game.OwnerPlayer.Team) or Game.FogGrid[# x div 16, y div 16]) {
+		event_perform(ev_draw, ev_draw_begin);
+	}
+}
 
 if(!surface_exists(SurfShadow))
 	SurfShadow = surface_create(512, 384);
 
 surface_set_target(SurfShadow);
 draw_clear_alpha(0, 0);
-with(Civilian) event_perform(ev_other, ev_user1);
+with(Civilian) {
+	if(Plr == Game.OwnerPlayer or (Plr.Team != 0 and Plr.Team == Game.OwnerPlayer.Team) or Game.FogGrid[# x div 16, y div 16]) {
+		event_perform(ev_other, ev_user1);
+	}
+}
 with(Terrains) event_perform(ev_other, ev_user1);
 surface_reset_target();
 	
@@ -19,7 +27,14 @@ draw_surface_stretched(SurfShadow,
 );
 shader_reset();
 
-with(Civilian) event_perform(ev_draw, ev_draw_end);
+with(Civilian) {
+	if(Plr == Game.OwnerPlayer or (Plr.Team != 0 and Plr.Team == Game.OwnerPlayer.Team) or Game.FogGrid[# x div 16, y div 16]) {
+		event_perform(ev_draw, ev_draw_end);
+	} else if(object_get_parent(object_index) == Builds and Game.LastKnownGrid[# x div 16, y div 16] == id) {
+		// Призрак: последняя известная позиция здания противника
+		draw_sprite_ext(sprite_index, 0, x, y, 1, 1, 90 * Dir, c_gray, 0.6);
+	}
+}
 with(Terrains) event_perform(ev_draw, ev_draw_end);
 
 if(!ds_list_empty(Pick)) {
@@ -62,6 +77,18 @@ if(Game.AbilityUse[0] and point_in_rectangle(MouseGuiX, MouseGuiY, 0, 0, 384, 38
 				var possible = 
 					!(collision_rectangle(x1, y1, x2, y2, Builds, false, false) ||
 					collision_rectangle(x1, y1, x2, y2, Terrains, false, false));
+				
+				// Для добытчика перидота — нужен нейтральный склад рядом
+				if(possible and AbObj.Abilities[AbSlot] == Ability.PeridotHarvester) {
+					SupplyCheckOK = false;
+					SupplyCheckX = xx;
+					SupplyCheckY = yy;
+					with(BuildPeridotSupply) {
+						if(Plr != Game.NeutralPlayer) continue;
+						if(point_distance(x, y, other.SupplyCheckX, other.SupplyCheckY) <= 96) { other.SupplyCheckOK = true; break; }
+					}
+					possible = SupplyCheckOK;
+				}
 				
 				gui_rect(x1, y1, x2, y2, possible ? c_green : c_red, 1, 1);
 				gui_rect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, possible ? c_green : c_red, 1, 1);

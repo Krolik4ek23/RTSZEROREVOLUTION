@@ -35,30 +35,6 @@ if(isAllDone) {
         }
         with(BuildCommandCenter) if(Plr == Game.NeutralPlayer) destroy(self);
         
-        // Назначаем склады перидота ближайшему игроку
-        for(var i = 0; i < NET_PLAYERS; i++) {
-            if(PlrObject[i].Color == 0) continue;
-            
-            MyCC = noone;
-            with(BuildCommandCenter) {
-                if(Plr == other.PlrObject[i]) { other.MyCC = id; break; }
-            }
-            if(MyCC == noone) continue;
-            
-            BestSupply = noone;
-            BestSupplyDist = 100000;
-            with(BuildPeridotSupply) {
-                if(Plr != Game.NeutralPlayer) continue;
-                other.SupplyDist = point_distance(x, y, other.MyCC.x, other.MyCC.y);
-                if(other.SupplyDist < other.BestSupplyDist) {
-                    other.BestSupplyDist = other.SupplyDist;
-                    other.BestSupply = id;
-                }
-            }
-            if(BestSupply != noone) BestSupply.Plr = PlrObject[i];
-        }
-        with(BuildPeridotSupply) if(Plr == Game.NeutralPlayer) destroy(self);
-        
         // Сброс состояния игры
         GameOver = false;
         AlivePlayersAtStart = 0;

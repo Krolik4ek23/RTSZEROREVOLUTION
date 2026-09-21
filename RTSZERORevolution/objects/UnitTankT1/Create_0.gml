@@ -16,3 +16,5 @@ HP = MaxHP;
 Damage = 50;
 AttackRange = 140;
 AttackSpeed = 30;
+
+TrackTimer = 0;

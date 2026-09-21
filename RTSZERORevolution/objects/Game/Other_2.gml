@@ -13,6 +13,7 @@ AbilitiesCount = 1;
 ability_add("TankT1", AbilityType.Simple, 800, 8, 0);
 ability_add("Dozer", AbilityType.Simple, 1000, 10, 0);
 ability_add("CommandCenter", AbilityType.Building, 2000, 40, sprBuildCommandCenter);
+ability_add("PeridotHarvester", AbilityType.Building, 1000, 20, sprBuildPeridotHarvester);
 
 create(SysMenu);
 

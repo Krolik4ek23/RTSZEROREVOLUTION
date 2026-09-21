@@ -2,18 +2,16 @@ event_inherited();
 
 switch(EVENT[0]) {
 	case EventType.CivAbilityBuildDone:
-		switch(EVENT[1]) {
-			case Ability.TankT1:
-				var Unit = create(UnitTankT1, x - 16, y - 16);
-				Unit.Plr = Plr;
-				Unit.ToX = Unit.x + 32; Unit.ToY = Unit.y;
-			break;
-			
-			case Ability.Dozer:
-				var Unit = create(UnitDozer, x - 16, y - 16);
-				Unit.Plr = Plr;
-				Unit.ToX = Unit.x + 32; Unit.ToY = Unit.y;
-			break;
+		{
+			var BuildType = EVENT[1];
+			// Спавн снаружи здания со случайным смещением (без наложений),
+			// юнит сам едет к точке сбора
+			var SX = x + 48 + irandom(16);
+			var SY = y - 24 + irandom(48);
+			var Unit = (BuildType == Ability.TankT1 ? create(UnitTankT1, SX, SY) : create(UnitDozer, SX, SY));
+			Unit.Plr = Plr;
+			Unit.ToX = x + 96 + irandom(32);
+			Unit.ToY = y + 96 + irandom(32);
 		}
 	break;
 	

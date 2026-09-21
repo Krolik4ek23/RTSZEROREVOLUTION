@@ -33,11 +33,11 @@ if(point_in_rectangle(MouseGuiX, MouseGuiY, 0, 0, 384, 384)) {
 
 		if(mouse_check_button_pressed(mb_right)) {
 			// Ищем врага под курсором
-			var EnemyTarget = noone;
+			EnemyTarget = noone;
 			with(Civilian) {
 				if(Plr == Game.OwnerPlayer or (Plr.Team != 0 and Plr.Team == Game.OwnerPlayer.Team)) continue;
 				if(!point_in_rectangle(MouseX, MouseY, bbox_left, bbox_top, bbox_right, bbox_bottom)) continue;
-				EnemyTarget = id;
+				other.EnemyTarget = id;
 				break;
 			}
 			

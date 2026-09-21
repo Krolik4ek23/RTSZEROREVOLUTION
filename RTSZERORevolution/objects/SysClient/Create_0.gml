@@ -23,6 +23,10 @@ for(var i = 0; i < NET_PLAYERS; i++) {
 Minimap = NOTEXTURE;
 SurfShroud = -1;alarm[0] = room_speed / 2;
 
+Game.FogGrid = ds_grid_create(MAP_W, MAP_H);
+Game.LastKnownGrid = ds_grid_create(MAP_W, MAP_H);
+ds_grid_clear(Game.LastKnownGrid, -1);
+
 GameMap = "";
 GameMapPreview = NOTEXTURE;
 

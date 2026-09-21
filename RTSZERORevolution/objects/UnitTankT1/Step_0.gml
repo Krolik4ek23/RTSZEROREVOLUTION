@@ -30,3 +30,15 @@ if(instance_exists(Target) and Damage > 0) {
 } else {
 	PushDir = BaseDir;
 }
+
+// Следы гусениц (только на клиенте и для видимых танков)
+if(!SERVER_SIDE and (Plr == Game.OwnerPlayer or (Plr.Team != 0 and Plr.Team == Game.OwnerPlayer.Team) or Game.FogGrid[# x div 16, y div 16])) {
+	if(instance_number(ObjTrackMark) < 1000) {
+		TrackTimer -= 1;
+		if(TrackTimer <= 0 and point_distance(xprevious, yprevious, x, y) > 0.2) {
+			TrackTimer = 12;
+			var Track = create(ObjTrackMark, x + irandom_range(-6, 6), y + irandom_range(-6, 6));
+			Track.image_angle = BaseDir + irandom_range(-15, 15);
+		}
+	}
+}

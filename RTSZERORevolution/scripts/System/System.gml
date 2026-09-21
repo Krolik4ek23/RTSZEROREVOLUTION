@@ -131,7 +131,8 @@ function System() {
 	enum Ability {
 		TankT1 = 1,
 		Dozer = 2,
-		CommandCenter = 3
+		CommandCenter = 3,
+		PeridotHarvester = 4
 	}
 #endregion
 

@@ -1,5 +1,10 @@
 alarm[2] = 5;
 
+// Обновляем сетку коллизий (стены + здания)
+mp_grid_clear_all(Game.MapCollision);
+mp_grid_add_instances(Game.MapCollision, Terrains, false);
+mp_grid_add_instances(Game.MapCollision, Builds, false);
+
 network_packet(BUFF1, NetPacket.UnitSync);
 with(Civilian) {
 	if(!NetUID) continue;
@@ -29,9 +34,9 @@ if(Status == ServerStatus.InGame and !GameOver and AlivePlayersAtStart > 1) {
 	for(var i = 0; i < NET_PLAYERS; i++) {
 		if(PlrObject[i].Color == 0) continue;
 		
-		var HasCC = false;
+		HasCC = false;
 		with(BuildCommandCenter) {
-			if(Plr == other.PlrObject[i]) { HasCC = true; break; }
+			if(Plr == other.PlrObject[i]) { other.HasCC = true; break; }
 		}
 		
 		if(HasCC) {

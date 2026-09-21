@@ -18,29 +18,42 @@ switch(EVENT[0]) {
 	
 	case EventType.CivAbilityStartBuild:
 		var AbilityID = Abilities[EVENT[1]];
-		switch(AbilityID) {
-			case Ability.CommandCenter:
-				var XX = EVENT[2] * 16, YY = EVENT[3] * 16, D = EVENT[4];
-				
-				var x1 = XX - 32, y1 = YY - 32, x2 = x1 + 63, y2 = y1 + 63;
-				
-				if (Plr.Cash >= Game.AbilitiesPrice[AbilityID] and 
-					!collision_rectangle(x1, y1, x2, y2, Builds, false, false) and
-					!collision_rectangle(x1, y1, x2, y2, Terrains, false, false)) {
-						
-					Plr.Cash -= Game.AbilitiesPrice[AbilityID];
-					
-					var Unit = create(BuildFrame, XX, YY);
-					Unit.Building = BuildCommandCenter;
-					Unit.ProgressSpeed = 1.6 / Game.AbilitiesTime[AbilityID];
-					Unit.Plr = Plr;
-					Unit.Dir = D;
-				
-					Target = Unit;
-					ToX =  Unit.x;
-					ToY = Unit.y;
-				}
-			break;
+		var XX = EVENT[2] * 16, YY = EVENT[3] * 16, D = EVENT[4];
+		// Область постройки соответствует размеру спрайта здания
+		var BuildSpr = Game.AbilitiesData[AbilityID];
+		var x1 = XX - sprite_get_xoffset(BuildSpr), y1 = YY - sprite_get_yoffset(BuildSpr);
+		var x2 = x1 + sprite_get_width(BuildSpr) - 1, y2 = y1 + sprite_get_height(BuildSpr) - 1;
+		
+		var CanBuild = (Plr.Cash >= Game.AbilitiesPrice[AbilityID] and 
+			!collision_rectangle(x1, y1, x2, y2, Builds, false, false) and
+			!collision_rectangle(x1, y1, x2, y2, Terrains, false, false));
+		
+		// Для добытчика перидота — рядом должен быть нейтральный склад
+		if(CanBuild and AbilityID == Ability.PeridotHarvester) {
+			SupplyCheckOK = false;
+			SupplyCheckX = XX;
+			SupplyCheckY = YY;
+			with(BuildPeridotSupply) {
+				if(Plr != Game.NeutralPlayer) continue;
+				if(point_distance(x, y, other.SupplyCheckX, other.SupplyCheckY) <= 96) { other.SupplyCheckOK = true; break; }
+			}
+			CanBuild = SupplyCheckOK;
+		}
+		
+		if(CanBuild) {
+			Plr.Cash -= Game.AbilitiesPrice[AbilityID];
+			
+			var BuildObj = (AbilityID == Ability.CommandCenter ? BuildCommandCenter : BuildPeridotHarvester);
+			
+			var Unit = create(BuildFrame, XX, YY);
+			Unit.Building = BuildObj;
+			Unit.ProgressSpeed = 1.6 / Game.AbilitiesTime[AbilityID];
+			Unit.Plr = Plr;
+			Unit.Dir = D;
+		
+			Target = Unit;
+			ToX = Unit.x;
+			ToY = Unit.y;
 		}
 	break;
 }
